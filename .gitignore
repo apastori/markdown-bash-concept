@@ -1,0 +1,69 @@
+# OS-generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs (if any)
+/build/
+/dist/
+/out/
+/target/
+
+# Dependency directories
+node_modules/
+bower_components/
+
+# Environment files (should be configured per environment)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Local configuration files
+config.local.*
+settings.local.*
+
+# macOS
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+
+# Windows (included for cross-platform compatibility, though focus is Unix)
+[Hh]umbs.db
+*.stackdump
+
+# Backup files
+*.backup
+*.bak
+
+# Optional: ignore large media files if not needed in repo
+# *.mp4
+# *.mov
+# *.avi
+
+# Optional: ignore compiled outputs if this becomes a static site
+# /public/
+# /_site/

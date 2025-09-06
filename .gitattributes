@@ -1,0 +1,37 @@
+# Text files
+*.md text eol=lf
+*.txt text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.xml text eol=lf
+
+# Documentation files
+README text eol=lf
+LICENSE text eol=lf
+CHANGELOG text eol=lf
+CONTRIBUTING text eol=lf
+
+# Git related
+.gitattributes text eol=lf
+.gitignore text eol=lf
+
+# Shell scripts (common in Unix projects)
+*.sh text eol=lf
+
+# Ensure proper line ending handling
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.zip binary
+*.tar binary
+*.gz binary
+
+# Detect whitespace errors in Markdown files
+*.md whitespace=fix,-indent-with-non-tab,tab-in-indent,tabwidth=4
