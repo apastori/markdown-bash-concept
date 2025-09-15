@@ -3,6 +3,7 @@
 set -euo pipefail
 
 source "$(dirname "$0")/get_token_type.sh"
+source "$(dirname "$0")/tokenize_inline.sh"
 
 # Tokenize a single line
 tokenize_line() {
