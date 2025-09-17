@@ -3,6 +3,7 @@
 set -euo pipefail
 
 source "$(dirname "$0")/log_utils.sh"
+source "$(dirname "$0")/tokenize_line.sh"
 
 # Tokenize from string
 tokenize_string() {
@@ -37,3 +38,5 @@ tokenize_file() {
         ((line_num++))
     done < "$filepath"
 }
+
+export -f tokenize_string tokenize_file

@@ -7,6 +7,7 @@ set -euo pipefail
 
 source "$(dirname "$0")/env.sh" "$@"
 source "$(dirname "$0")/log_utils.sh"
+source "$(dirname "$0")/tokenize_utils.sh"
 
 # Initialize log file
 init_log "mdbashtoto.log"

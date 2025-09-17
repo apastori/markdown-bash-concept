@@ -33,7 +33,7 @@ log() {
 log_err() {
     local msg="$1"
     # print to stderr
-    echo "$msg" > &2
+    echo "$msg" >&2
     if [[ $VERBOSE -eq 1 ]]; then
         echo "$msg" >> "$LOG_FILE"
     fi
