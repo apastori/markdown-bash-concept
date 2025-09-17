@@ -9,8 +9,6 @@ source "$(dirname "$0")/tokenize_line.sh"
 tokenize_string() {
     local input="$1"
     local line_num=1
-	    
-    declare -a TOKENS=()
 
     # Process line by line
     while IFS= read -r line || [[ -n "$line" ]]; do
@@ -29,8 +27,6 @@ tokenize_file() {
         log_error "Error: File '$filepath' not found"
         return 1
     fi
-
-    declare -a TOKENS=()
   
     # Process file line by line
     while IFS= read -r line || [[ -n "$line" ]]; do

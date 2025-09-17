@@ -3,6 +3,7 @@
 set -euo pipefail
 
 source "$(dirname "$0")/log_utils.sh"
+source "$(dirname "$0")/add_token.sh"
 
 tokenize_inline_elements() {
     local text="$1"

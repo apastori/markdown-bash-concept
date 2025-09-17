@@ -3,6 +3,7 @@
 set -euo pipefail
 
 source "$(dirname "$0")/get_token_type.sh"
+source "$(dirname "$0")/add_token.sh"
 source "$(dirname "$0")/tokenize_inline.sh"
 
 # Tokenize a single line
@@ -17,32 +18,32 @@ tokenize_line() {
     fi
     
     # Horizontal rule (--- or *** or ___)
-    if echo "$line" | grep -q '^[[:space:]]*\([-*_]\)\([[:space:]]*\1\)\{2,\}[[:space:]]*$'; then
+    if echo "$line" | grep -qE '^[[:space:]]*([-*_])([[:space:]]*\1){2,}[[:space:]]*$'; then
         add_token "$(get_token_type "HORIZONTAL_RULE")" "" "$line_num"
         return
     fi
     
     # Indented code block (4+ spaces or 1+ tabs)
-    if echo "$line" | grep -q '^[[:space:]]\{4,\}'; then
-        local content=$(echo "$line" | sed 's/^[[:space:]]\{4\}//')
+    if echo "$line" | grep -qE '^[[:space:]]{4,}'; then
+        local content=$(echo "$line" | sed -E 's/^[[:space:]]{4}//')
         add_token "$(get_token_type "CODE_BLOCK")" "content:${content}" "$line_num"
         return
     fi
     
     # Code block start (```)
-    if echo "$line" | grep -q '^[[:space:]]*\(`\{3,\}\|~\{3,\}\)'; then
-        local fence=$(echo "$line" | sed 's/^[[:space:]]*\(\(`\{3,\}\|~\{3,\}\)\).*/\1/')
-        local lang=$(echo "$line" | sed 's/^[[:space:]]*\(`\{3,\}\|~\{3,\}\)\([^[:space:]]*\).*/\2/')
+    if echo "$line" | grep -qE '^[[:space:]]*(`{3,}|~{3,})'; then
+        local fence=$(echo "$line" | sed -E 's/^[[:space:]]*((`{3,}|~{3,})).*/\1/')
+        local lang=$(echo "$line" | sed -E 's/^[[:space:]]*(`{3,}|~{3,})([^[:space:]]*).*/\2/')
         # Store the fence type/length to match closing fence later
         add_token "$(get_token_type "CODE_BLOCK")" "start:${lang}:${fence}" "$line_num"
         return
     fi
     
     # Heading (# ## ### #### ##### ######)
-    if echo "$line" | grep -q '^[[:space:]]*#{1,6}[[:space:]]\+'; then
-        local hashes=$(echo "$line" | sed 's/^[[:space:]]*\(#\{1,6\}\).*/\1/')
-	local level=${#hashes}
-        local text=$(echo "$line" | sed 's/^[[:space:]]*#{1,6}[[:space:]]\+\(.*\)$/\1/')
+    if echo "$line" | grep -qE '^[[:space:]]*#{1,6}[[:space:]]+'; then
+        local hashes=$(echo "$line" | sed -E 's/^[[:space:]]*([#]{1,6}).*/\1/')
+        local level=${#hashes}
+        local text=$(echo "$line" | sed -E 's/^[[:space:]]*[#]{1,6}[[:space:]]+(.*)$/\1/')
         add_token "$(get_token_type "HEADING")" "${level}:${text}" "$line_num"
         tokenize_inline_elements "$text" "$line_num" "heading"
         return
@@ -59,16 +60,16 @@ tokenize_line() {
     fi
     
     # Unordered list item (- * +)
-    if echo "$line" | grep -q '^[[:space:]]*[-*+][[:space:]]\+'; then
-        local item_text=$(echo "$line" | sed 's/^[[:space:]]*[-*+][[:space:]]\+\(.*\)$/\1/')
+    if echo "$line" | grep -qE '^[[:space:]]*[-*+][[:space:]]+'; then
+        local item_text=$(echo "$line" | sed -E 's/^[[:space:]]*[-*+][[:space:]]+(.*)$/\1/')
         add_token "$(get_token_type "UNORDERED_LIST_ITEM")" "$item_text" "$line_num"
         tokenize_inline_elements "$item_text" "$line_num" "list_item"
         return
     fi
     
     # Ordered list item (1. 2. etc.)
-    if echo "$line" | grep -q '^[[:space:]]*[0-9]\+\.[[:space:]]\+'; then
-        local item_text=$(echo "$line" | sed 's/^[[:space:]]*[0-9]\+\.[[:space:]]\+\(.*\)$/\1/')
+    if echo "$line" | grep -qE '^[[:space:]]*[0-9]+\.[[:space:]]+'; then
+        local item_text=$(echo "$line" | sed -E 's/^[[:space:]]*[0-9]+\.[[:space:]]+(.*)$/\1/')
         add_token "$(get_token_type "ORDERED_LIST_ITEM")" "$item_text" "$line_num"
         tokenize_inline_elements "$item_text" "$line_num" "list_item"
         return
