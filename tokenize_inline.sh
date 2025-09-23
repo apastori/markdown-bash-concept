@@ -4,6 +4,7 @@ set -euo pipefail
 
 source "$(dirname "$0")/log_utils.sh"
 source "$(dirname "$0")/add_token.sh"
+source "$(dirname "$0")/get_token_type.sh"
 
 tokenize_inline_elements() {
     local text="$1"
@@ -49,13 +50,13 @@ tokenize_inline_elements() {
 
             if [ $found_end -eq 1 ]; then
                 local code_content="${text:$content_start:$((end_pos - content_start))}"
-                add_token "${TOKEN_TYPES[INLINE_CODE]}" "$code_content" "$line_num" "$context"
+                add_token "$(get_token_type "CODE_INLINE")" "$code_content" "$line_num" "$context"
                 pos=$((end_pos + backtick_count))
                 continue
             fi
             # Unclosed inline code - treat as literal text and emit warning
-	    log_error "Warning: Unclosed inline code at line $line_num, position $((pos + 1))"
-	    add_token "${TOKEN_TYPES[TEXT]}" "$char" "$line_num" "$context"
+	    log_err "Warning: Unclosed inline code at line $line_num, position $((pos + 1))"
+	    add_token "$(get_token_type "TEXT")" "$char" "$line_num" "$context"
 	    pos=$((pos + 1))
             continue
         fi
@@ -102,22 +103,22 @@ tokenize_inline_elements() {
 		    local content="${text:$content_start:$((end_pos - content_start))}"
 		    # Don't allow empty emphasis content
 		    if [ -z "$content" ]; then
-			log_error "Warning: Empty emphasis content at line $line_num, position $((pos + 1))"
-			add_token "${TOKEN_TYPES[TEXT]}" "${text:$pos:$delim_count}" "$line_num" "$context"
+			log_err "Warning: Empty emphasis content at line $line_num, position $((pos + 1))"
+			add_token "$(get_token_type "TEXT")" "${text:$pos:$delim_count}" "$line_num" "$context"
 			pos=$((pos + delim_count))
 			continue
 		    fi
 		    # Determine token type based on delimiter count
 		    case $delim_count in
 			1)
-			    add_token "${TOKEN_TYPES[ITALIC]}" "$content" "$line_num" "$context"
+			    add_token "$(get_token_type "ITALIC")" "$content" "$line_num" "$context"
 			    ;;
 			2)
-			    add_token "${TOKEN_TYPES[BOLD]}" "$content" "$line_num" "$context"
+			    add_token "$(get_token_type "BOLD")" "$content" "$line_num" "$context"
 			    ;;
 			3)
 			    # Triple emphasis = bold + italic
-			    add_token "${TOKEN_TYPES[BOLD_ITALIC]}" "$content" "$line_num" "$context"
+			    add_token "$(get_token_type "BOLD_ITALIC")" "$content" "$line_num" "$context"
 			    ;;
 		    esac
 
@@ -129,8 +130,8 @@ tokenize_inline_elements() {
 		    continue
 		fi
 		# Unclosed emphasis - treat as literal text and emit warning
-		log_error "Warning: Unclosed emphasis at line $line_num, position $((pos + 1))"
-		add_token "${TOKEN_TYPES[TEXT]}" "$char" "$line_num" "$context"
+		log_err "Warning: Unclosed emphasis at line $line_num, position $((pos + 1))"
+		add_token "$(get_token_type "TEXT")" "$char" "$line_num" "$context"
 		pos=$((pos + 1))
 		continue
 	     fi
@@ -181,13 +182,13 @@ tokenize_inline_elements() {
 		    local image_title=""
 
 		    # Check for title in quotes (simple parsing - handles "title" or 'title')
-		    if [[ "$url_and_title" =~ ^(.+)[[:space:]]+[\"\'](.*)[\"\']*$ ]]; then
+		    if [[ "$url_and_title" =~ ^(.+)[[:space:]]+[""](.*)[""]*$ ]]; then
 			image_url="${BASH_REMATCH[1]}"
 			image_title="${BASH_REMATCH[2]}"
 		    fi
 
 		    # Store image data (format: alt:url:title)
-		    add_token "${TOKEN_TYPES[IMAGE]}" "${alt_text}:${image_url}:${image_title}" "$line_num" "$context"
+		    add_token "$(get_token_type "IMAGE")" "${alt_text}:${image_url}:${image_title}" "$line_num" "$context"
 
 		    # Process alt text for nested formatting (if needed)
 		    if [ -n "$alt_text" ]; then
@@ -200,8 +201,8 @@ tokenize_inline_elements() {
 	    fi
 	    # If we get here, it's not a valid image syntax
 	    # Fall through to handle the '!' as regular text
-	    log_error "Warning: Unclosed image at line $line_num, position $((pos + 1))"
-	    add_token "${TOKEN_TYPES[TEXT]}" "$char" "$line_num" "$context"
+	    log_err "Warning: Unclosed image at line $line_num, position $((pos + 1))"
+	    add_token "$(get_token_type "TEXT")" "$char" "$line_num" "$context"
 	    pos=$((pos + 1))
 	    continue
         fi
@@ -244,7 +245,7 @@ tokenize_inline_elements() {
                     local link_text="${text:$((pos + 1)):$((bracket_end - pos - 2))}"
                     local link_url="${text:$((bracket_end + 1)):$((paren_end - bracket_end - 2))}"
 
-                    add_token "${TOKEN_TYPES[LINK]}" "${link_text}:${link_url}" "$line_num" "$context"
+                    add_token "$(get_token_type "LINK")" "${link_text}:${link_url}" "$line_num" "$context"
 
                     # Process link text for nested formatting
                     if [ -n "$link_text" ]; then
