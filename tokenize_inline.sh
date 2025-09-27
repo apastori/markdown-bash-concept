@@ -10,6 +10,10 @@ tokenize_inline_elements() {
     local text="$1"
     local line_num="$2"
     local context="$3"
+	
+	# Remove stray carriage returns (Windows CRLF) from inline text
+    text="${text//$'\r'/}"
+
     local len=${#text}
     local pos=0
     local found_end=0

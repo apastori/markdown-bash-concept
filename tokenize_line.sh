@@ -10,6 +10,9 @@ source "$(dirname "$0")/tokenize_inline.sh"
 tokenize_line() {
     local line="$1"
     local line_num="$2"
+
+    # Remove stray carriage returns (Windows CRLF) which break token output
+    line="${line//$'\r'/}"
     
     # Empty line
     if echo "$line" | grep -q '^[[:space:]]*$'; then

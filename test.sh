@@ -2,6 +2,9 @@
 
 set -uo pipefail
 
+# Load environment scripts
+source "$(dirname "$0")/env.sh"
+
 # Test runner for the markdown tokenizer
 
 # Colors for output
@@ -12,9 +15,9 @@ NC='\033[0m' # No Color
 # Function to run a single test
 run_test() {
     local test_name="$1"
-    local test_file="test/${test_name}.md"
-    local snapshot_file="test/snapshots/${test_name}.snap"
-    local output_file="test/output/${test_name}.out"
+    local test_file="${TEST_DIR}/${test_name}.md"
+    local snapshot_file="${TEST_DIR}/${SNAPSHOT_DIR}/${test_name}.snap"
+    local output_file="${TEST_DIR}/${OUTPUT_DIR}/${test_name}.out"
 
     echo "Running test: ${test_name}..."
 
@@ -30,7 +33,7 @@ run_test() {
     fi
 
     # Compare the output with the snapshot
-    local tmp_snapshot_file="test/output/${test_name}.snap.tmp"
+    local tmp_snapshot_file="${TEST_DIR}/${OUTPUT_DIR}/${test_name}.snap.tmp"
     tail -n +2 "$snapshot_file" > "$tmp_snapshot_file"
     if diff -u "$tmp_snapshot_file" "$output_file"; then
         echo -e "${GREEN}PASS${NC}: ${test_name}"
@@ -52,23 +55,27 @@ main() {
     local total_tests=0
 
     # Create test directories if they don't exist
-    if [ ! -d "test/snapshots" ]; then
-        echo "Creating snapshots directory..."
-        mkdir "test/snapshots"
+    if [ ! -d "$TEST_DIR" ]; then
+        echo "Creating test directory..."
+        mkdir "$TEST_DIR"
     fi
-    if [ ! -d "test/output" ]; then
+    if [ ! -d "$SNAPSHOT_DIR" ]; then
+        echo "Creating snapshots directory..."
+        mkdir "$TEST_DIR/snapshots"
+    fi
+    if [ ! -d "$OUTPUT_DIR" ]; then
         echo "Creating output directory..."
-        mkdir "test/output"
+        mkdir "$TEST_DIR/output"
     fi
 
     # Find all test files
-    for test_file in test/*.md; do
+    for test_file in "$TEST_DIR"/*.md; do
         local test_name=$(basename "$test_file" .md)
         run_test "$test_name" || ((failed_tests++))
         ((total_tests++))
     done
-
-    echo
+    echo "-----------------------------------"
+    echo "Test Summary:"
     if [ "$failed_tests" -eq 0 ]; then
         echo -e "${GREEN}All ${total_tests} tests passed!${NC}"
         exit 0

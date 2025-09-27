@@ -8,14 +8,18 @@ init_log() {
         LOG_FILE="mdbashtoto.log"
     fi
     if [[ VERBOSE -eq 1 ]]; then
+        # Create log directory if it doesn't exist
+        if [[ ! -d "$LOG_DIR" ]]; then
+            mkdir -p "$LOG_DIR"
+        fi
         # Remove old log if it exists
-        if [[ -f "$LOG_FILE" ]]; then
-            rm "$LOG_FILE"
+        if [[ -f "$LOG_DIR/$LOG_FILE" ]]; then
+            rm "$LOG_DIR/$LOG_FILE"
         fi
         # Create a new empty log file
-        touch "$LOG_FILE"
+        touch "$LOG_DIR/$LOG_FILE"
         # Add timestamp for execution start
-        echo "Execution started at: $(date '+%Y-%m-%d %H:%M:%S')" >> "$LOG_FILE"
+        echo "Execution started at: $(date '+%Y-%m-%d %H:%M:%S')" >> "$LOG_DIR/$LOG_FILE"
     fi
 }
 
@@ -25,7 +29,7 @@ log() {
     # print to stdout
     echo "$msg"
     if [[ $VERBOSE -eq 1 ]]; then
-        echo "$msg" >> "$LOG_FILE"
+        echo "$msg" >> "$LOG_DIR/$LOG_FILE"
     fi
 }
 
@@ -35,7 +39,7 @@ log_err() {
     # print to stderr
     echo "$msg" >&2
     if [[ $VERBOSE -eq 1 ]]; then
-        echo "$msg" >> "$LOG_FILE"
+        echo "$msg" >> "$LOG_DIR/$LOG_FILE"
     fi
 }
 

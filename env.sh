@@ -33,6 +33,12 @@ if [ "$1" = "-v" ]; then
   VERBOSE=1
 fi
 
+export TEST_DIR="test"
+export SNAPSHOT_DIR="$TEST_DIR/snapshots"
+export OUTPUT_DIR="$TEST_DIR/output"
+export LOG_DIR="logs"
+export TEMP_DIR="temp"
+
 echo "Config script finished without errors"
 
 return 0

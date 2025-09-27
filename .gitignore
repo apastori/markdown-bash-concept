@@ -60,10 +60,14 @@ settings.local.*
 *.bak
 
 # Optional: ignore large media files if not needed in repo
-# *.mp4
-# *.mov
-# *.avi
+*.mp4
+*.mov
+*.avi
 
 # Optional: ignore compiled outputs if this becomes a static site
-# /public/
-# /_site/
+/public/
+/_site/
+
+# Ignore the files in the temporary directory
+/temp/*
+!/temp/.gitkeep

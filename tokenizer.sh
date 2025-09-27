@@ -5,17 +5,7 @@
 
 set -euo pipefail
 
-source "$(dirname "$0")/env.sh" "$@"
-source "$(dirname "$0")/log_utils.sh"
 source "$(dirname "$0")/tokenize_utils.sh"
-
-# Initialize log file
-init_log "mdbashtoto.log"
-
-# If verbose flag is up, then shift first parameter
-if [ "$VERBOSE" -eq 1 ]; then
-    shift
-fi
 
 if [ "$IS_OLD_MACHINE" -eq 0 ] && [ "$HAS_ASSOC" -eq 1 ]; then
     # Bash 4.0 or later: Use associative array
@@ -43,34 +33,24 @@ else
     export TOKEN_TYPES
 fi
 
-declare -a TOKENS=()
-
 # Main function
 main() {
-    local input="$1"
-
-    if [[ -z "$input" ]]; then
-        log_error "Usage: $0 <string|file>"
-        log_error "Examples:"
-        log_error "  $0 '# Hello World'"
-        log_error "  $0 document.md"
-        return 1
-    fi
-
+    local input_content="$1"
+    local input_type="$2"
     # Check if input is a file or string
-    if [[ -f "$input" ]]; then
-        log "Tokenizing file: $input"
-        tokenize_file "$input"
+    if [ "$input_type" = "file" ]; then
+        log "Tokenizing file: $input_content"
+        tokenize_file "$input_content"
+    elif [ "$input_type" = "string" ]; then
+        log "Tokenizing string: $input_content"
+        tokenize_string "$input_content"
     else
-        log "Tokenizing string: $input"
-        tokenize_string "$input"
+        log_err "Invalid input type: $input_type. Must be 'file' or 'string'."
+        exit 1
     fi
 }
 
-# Run if script is executed directly
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    main "$@"
-    echo "${TOKENS[@]}"
-fi
+# Run the script even if it is sourced
+main "$@"
 
 exit 0

@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-# Function to add a token to the TOKENS array
-# TOKENS array is expected to be declared in the calling script
+# Function to add a token to the Temporary File with Tokens
+
 add_token() {
     local token_type="$1"
     local token_value="$2"
@@ -11,5 +11,5 @@ add_token() {
     local context="${4:-}" # Optional context
 
     local token_string="$token_type|$token_value|$line_num|$context"
-    TOKENS+=("$token_string")
+    echo "$token_string" >> "$TEMP_FILE"
 }
