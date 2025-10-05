@@ -46,3 +46,4 @@ log_err() {
 # Export functions so other scripts can use them
 export -f init_log log log_err
 
+

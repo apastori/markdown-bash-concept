@@ -53,4 +53,4 @@ main() {
 # Run the script even if it is sourced
 main "$@"
 
-exit 0
+return 0

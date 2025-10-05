@@ -35,12 +35,12 @@ main() {
     else
         source "$(dirname "$0")/tokenizer.sh" $input "string"
     fi
+    source "$(dirname "$0")/ast_builder.sh" "$TEMP_FILE"
 }
 
 # Run if script is executed directly
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     main "$@"
-    echo "${TOKENS[@]}"
 fi
 
 exit 0
